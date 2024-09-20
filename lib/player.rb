@@ -1,3 +1,9 @@
 class Player
-  #todo
+  def initialize(game)
+    @game = game
+  end
+
+  def make_guess
+    @game.print_board
+  end
 end
