@@ -4,13 +4,14 @@ class HumanPlayer < Player
   def make_guess
     super
     guess = []
-    4.times do |i|
+    for i in 1..4
       puts "Type the colour in slot #{i}:"
-      loop do
+      ith_guess = ""
+      while Game.colours_trimmed[1..-1].none?(ith_guess)
         ith_guess = gets.chomp
-        break unless @@colours_trimmed[1..-1].none?(ith_guess)
       end
-      guess[i-1] = @@colours_trimmed.index(ith_guess)
+      puts i
+      guess[i-1] = Game.colours_trimmed.index(ith_guess)
     end
     guess
   end
