@@ -25,7 +25,9 @@ class Game
     @board = Array.new(12)
     @turn = 1
     until @turn > 12 do
+      #############
       p @secret
+      #############
       guess = @guesser.make_guess
       score = score(guess)
       if win?(score)
@@ -33,8 +35,8 @@ class Game
         break
       end
       @board[@turn-1] = {guess:, score:}
-      puts score
       @turn += 1 
+      print_board
     end
 
     puts "\nend of game"
@@ -71,5 +73,15 @@ class Game
   end
 
   def print_board
+    col_separator  = " | "
+    row_separator =   "----+" + ("--------+" * 4) + "------"
+    board = "Turn|Guess   " + ("         " * 3) + "|Score \n"
+    @board.compact.length.times do |i|
+      turn = (i+1).to_s.rjust(3) + col_separator
+      guess = @board[i][:guess].map{ |g| COLOURS[g] }.join(col_separator)
+      score = col_separator + @board[i][:score] + " \n"
+      board << row_separator + "\n" + turn + guess + score
+    end
+    puts board << row_separator
   end
 end
