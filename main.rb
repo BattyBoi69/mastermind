@@ -19,15 +19,13 @@ class Game
   def play
     @secret = @mastermind.choose_secret
     
-    puts "intro" #todo
-    puts @@colours_trimmed
+    puts "Begin Mastermind, the game. Here are the available colours:"
+    puts @@colours_trimmed[1..-1]
+    puts "\nLet the game begin:\n"
 
     @board = Array.new(12)
     @turn = 1
     until @turn > 12 do
-      #############
-      p @secret
-      #############
       guess = @guesser.make_guess
       score = score(guess)
       if win?(score)
