@@ -1,34 +1,30 @@
 require_relative 'player'
 
 class ComputerPlayer < Player
+  WORST_SCORE = "----"
+
   def initialize(game)
     super(game)
     @space = Array.new(9**4).each_with_index.map do |_, i|
       i.digits(9).map{ |j| j + 1 }.concat([1,1,1]).take(4)
     end
+    @banned_colours = []
   end
   attr_accessor :space
-  
+
   def make_guess
-    puts "SPACE:"
-    p @space[0..10]
-    p @space[-10..-1]
-    puts "\n"
     game_board = @game.board.compact
-    return random_code(4) if game_board.length <= 1
 
-    persistent = persistent_colours
-    num_of_persistent = persistent.length
-    num_of_hits = game_board[-1][:score].delete("-").length
+    return @space.sample if game_board.length <= 0
+    
+    if game_board[-1][:score] == WORST_SCORE
+      remove_prev_guess
+      return @space.sample
+    end
 
-    num_of_psample = [num_of_persistent, num_of_hits].min
-    num_of_hsample = num_of_hits - num_of_psample
-    num_of_miss = 4 - num_of_hits
-
-    guess = random_code(num_of_miss)
-    num_of_psample.times{ guess << persistent.sample }
-    num_of_hsample.times{ guess << game_board[-1][:guess].sample }
-    guess.shuffle
+    #persistent  = persistents().reject{ |c| @banned_colours.include?(c) }
+    guess_space = @space 
+    guess_space.sample
   end
 
   def choose_secret
@@ -41,12 +37,21 @@ class ComputerPlayer < Player
     code
   end
 
-  def persistent_colours
+  def persistents
     game_board = @game.board.compact
     return [] if game_board.length < 2
     recent_guess = game_board[-1][:guess]
 
     recent_guess.filter{ |ith| game_board[-2][:guess].include?(ith) }
   end
+
+  def remove_prev_guess
+    prev_guess = @game.board.compact[-1][:guess].uniq
+    prev_guess.each do |colour|
+      @space.reject!{ |pattern| pattern.include?(colour) }
+    end
+    @banned_colours.concat(prev_guess).uniq!
+  end
+
 
 end
