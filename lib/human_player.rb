@@ -1,8 +1,16 @@
 require_relative 'player'
 
 class HumanPlayer < Player
+  def choose_secret
+    puts "Choose secret code for the other player to guess:"
+    request_code
+  end
+
   def make_guess
-    super
+    request_code
+  end
+
+  def request_code
     guess = []
     for i in 1..4
       puts "Type the colour in slot #{i}:"

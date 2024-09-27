@@ -6,24 +6,23 @@ class Game
   @@colours_trimmed = COLOURS.map{ |colour| colour.strip }
 
   def initialize(player_1_class, player_2_class)
-
     @mastermind = player_1_class.new(self)
     @guesser = player_2_class.new(self)
   end
-  attr_reader :secret
+  attr_reader :secret, :board
 
   def self.colours_trimmed
     @@colours_trimmed
   end
 
   def play
-    @secret = @mastermind.choose_secret
     
-    puts "Begin Mastermind, the game. Here are the available colours:"
+    puts "Begin Mastermind, the game. Here are the available colours:\n"
     puts @@colours_trimmed[1..-1]
-    puts "\nLet the game begin:\n"
+    puts "\nLet the game begin:\n\n"
 
     @board = Array.new(12)
+    @secret = @mastermind.choose_secret
     @turn = 1
     until @turn > 12 do
       guess = @guesser.make_guess
@@ -34,9 +33,10 @@ class Game
       end
       @board[@turn-1] = {guess:, score:}
       @turn += 1 
-      print_board
+      print_board if @guesser.class == HumanPlayer
     end
 
+    print_board
     puts "\nend of game"
   end
 
