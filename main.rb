@@ -2,7 +2,10 @@ require_relative 'lib/human_player'
 require_relative 'lib/computer_player'
 
 class Game
-  COLOURS = ["", " red  ", " blue ", "green ", " pink ", " navy ", "orange", "yellow", "white ", "black "] #index starts at 1 to make it easier
+  COLOURS = ["", " red  ", " blue ", "green ", " pink ", " navy ", "orange",
+             "yellow", "white ", "black "] #index starts at 1
+  MAX_TURNS = 12
+  WINNING_SCORE = "++++"
   @@colours_trimmed = COLOURS.map{ |colour| colour.strip }
 
   def initialize(player_1_class, player_2_class)
@@ -21,19 +24,20 @@ class Game
     puts @@colours_trimmed[1..-1]
     puts "\nLet the game begin:\n\n"
 
-    @board = Array.new(12)
+    @board = Array.new(MAX_TURNS)
     @secret = @mastermind.choose_secret
     @turn = 1
-    until @turn > 12 do
+    until @turn > MAX_TURNS do
       guess = @guesser.make_guess
       score = score(guess)
+      @board[@turn-1] = {guess:, score:}
       if win?(score)
         puts "Congrats, you won!"
         break
       end
-      @board[@turn-1] = {guess:, score:}
+      
+      print_board if @guesser.is_a?(HumanPlayer)
       @turn += 1 
-      print_board if @guesser.class == HumanPlayer
     end
 
     print_board
@@ -59,7 +63,7 @@ class Game
   end
 
   def win?(score)
-    score == "++++"
+    score == WINNING_SCORE
   end
 
   def is_exact_match?(colour_index, index)

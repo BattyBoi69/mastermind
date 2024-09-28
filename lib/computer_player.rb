@@ -15,16 +15,24 @@ class ComputerPlayer < Player
   def make_guess
     game_board = @game.board.compact
 
-    return @space.sample if game_board.length <= 0
-    
+    return @space.sample if game_board.length <= 1
+
     if game_board[-1][:score] == WORST_SCORE
       remove_prev_guess
       return @space.sample
     end
 
-    #persistent  = persistents().reject{ |c| @banned_colours.include?(c) }
-    guess_space = @space 
-    guess_space.sample
+    persistent  = persistents().reject{ |c| @banned_colours.include?(c) }
+    unless persistent == []
+      guess_space = @space.filter do |guess|
+        persistent.any?{ |c| guess.include?(c) }
+      end
+    end
+    guess = guess_space.sample
+    p @banned_colours
+    p persistent
+    p guess
+    guess
   end
 
   def choose_secret
