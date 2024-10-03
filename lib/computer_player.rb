@@ -1,4 +1,5 @@
 require_relative 'player'
+require_relative 'enumerable_extensions'
 
 class ComputerPlayer < Player
   WORST_SCORE = "----"
@@ -17,22 +18,18 @@ class ComputerPlayer < Player
 
     return @space.sample if game_board.length <= 1
 
-    if game_board[-1][:score] == WORST_SCORE
+    p game_board
+    case misses(game_board[-1][:score])
+    when 1
+      filter_triples
+    when 2, 3
+      filter_prev_guess
+    when 4
       remove_prev_guess
-      return @space.sample
     end
-
-    persistent  = persistents().reject{ |c| @banned_colours.include?(c) }
-    unless persistent == []
-      guess_space = @space.filter do |guess|
-        persistent.any?{ |c| guess.include?(c) }
-      end
-    end
-    guess = guess_space.sample
-    p @banned_colours
-    p persistent
-    p guess
-    guess
+    p @space.length
+    p @space if @space.length < 9
+    @space.sample
   end
 
   def choose_secret
@@ -45,14 +42,6 @@ class ComputerPlayer < Player
     code
   end
 
-  def persistents
-    game_board = @game.board.compact
-    return [] if game_board.length < 2
-    recent_guess = game_board[-1][:guess]
-
-    recent_guess.filter{ |ith| game_board[-2][:guess].include?(ith) }
-  end
-
   def remove_prev_guess
     prev_guess = @game.board.compact[-1][:guess].uniq
     prev_guess.each do |colour|
@@ -61,5 +50,35 @@ class ComputerPlayer < Player
     @banned_colours.concat(prev_guess).uniq!
   end
 
+  def filter_prev_guess
+    prev_guess = @game.board.compact[-1][:guess].uniq
+    new_space = []
+    prev_guess.each{ |colour| new_space.concat(filter_colour(colour)) }
+    @space = new_space.uniq
+  end
+
+  def filter_colour(colour)
+    @space.filter{ |pattern| pattern.include?(colour) }
+  end
+
+  def misses(score)
+    score.count "-"
+  end
+
+  def filter_triples
+    prev_guess = @game.board.compact[-1][:guess].uniq
+    prev_guess.repeated_combination(3) do |combination|
+      filter_specific(*combination)
+    end
+  end
+
+  def filter_specific(c1, c2, c3)
+    @space.filter! do |pattern|
+      pattern.reject_first(c1)
+        .reject_first(c2)
+        .reject_first(c3)
+        .length == 1
+    end
+  end
 
 end
