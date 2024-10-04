@@ -2,9 +2,8 @@ require_relative 'lib/human_player'
 require_relative 'lib/computer_player'
 
 class Game
-  COLOURS = ["", " red  ", " blue ", "green ", " pink ", " navy ", "orange",
-             "yellow", "white ", "black "] #index starts at 1
-  MAX_TURNS = 12
+  COLOURS = ["", " red  ", " blue ", "green ", " pink ", "yellow", "white "] #index starts at 1
+  MAX_TURNS = 24
   WINNING_SCORE = "++++"
   @@colours_trimmed = COLOURS.map{ |colour| colour.strip }
 
@@ -12,7 +11,7 @@ class Game
     @mastermind = player_1_class.new(self)
     @guesser = player_2_class.new(self)
   end
-  attr_reader :secret, :board
+  attr_reader :secret, :board, :colours_trimmed
 
   def self.colours_trimmed
     @@colours_trimmed
@@ -59,7 +58,7 @@ class Game
         end
       end
     end
-    score.ljust(4, "-")
+    score.chars.sort.join.ljust(4, "-")
   end
 
   def win?(score)
